@@ -15,7 +15,7 @@ jobs:
       - name: Compile C Code
         uses: MyDummyorg159/actions-repo/compile@main
         with:
-          c_file: "sample.c"
+          c_file: "src/sample.c"
 
   static-analysis:
     runs-on: ubuntu-latest
@@ -25,4 +25,4 @@ jobs:
       - name: Static Code Analysis
         uses: MyDummyorg159/actions-repo/static-analysis@main
         with:
-          c_file: "sample.c"
+          c_file: "src/sample.c"
