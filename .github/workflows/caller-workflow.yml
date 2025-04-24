@@ -1,0 +1,28 @@
+name: caller-workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Compile C Code
+        uses: owner/custom-actions/compile@v1.0.0
+        with:
+          c_file: "sample.c"
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Static Code Analysis
+        uses: owner/custom-actions/static-analysis@v1.0.0
+        with:
+          c_file: "sample.c"
