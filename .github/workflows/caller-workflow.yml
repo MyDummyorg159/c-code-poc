@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
       - name: Compile C Code
-        uses: MyDummyorg159/custom-actions/compile@main
+        uses: MyDummyorg159/actions-repo/compile@main
         with:
           c_file: "sample.c"
 
@@ -23,6 +23,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
       - name: Static Code Analysis
-        uses: MyDummyorg159/custom-actions/static-analysis@main
+        uses: MyDummyorg159/actions-repo/static-analysis@main
         with:
           c_file: "sample.c"
