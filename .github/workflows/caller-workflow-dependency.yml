@@ -1,0 +1,30 @@
+name: caller-workflow
+
+on:
+  workflow_dispatch
+  #push:
+   # branches:
+     # - main
+ # pull_request:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Compile C Code
+        uses: MyDummyorg159/actions-repo/.github/actions/compile@main
+        with:
+          c_file: "src/sample.c"
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    needs : compile
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Static Code Analysis
+        uses: MyDummyorg159/actions-repo/.github/actions/static-analysis@main
+        with:
+          c_file: "src/sample.c"
