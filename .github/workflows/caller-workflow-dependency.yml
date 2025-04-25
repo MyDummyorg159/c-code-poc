@@ -1,4 +1,4 @@
-name: caller-workflow
+name: caller-workflow-dependency
 
 on:
   workflow_dispatch
