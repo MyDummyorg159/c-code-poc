@@ -1,4 +1,4 @@
-name: caller-workflow-runner-based.yml
+name: caller-workflow-runner-based
 
 on:
   workflow_dispatch:
