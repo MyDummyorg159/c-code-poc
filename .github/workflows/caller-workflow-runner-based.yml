@@ -1,0 +1,26 @@
+name: caller-workflow-runner-based.yml
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Choose the runner (ubuntu-latest or windows-latest)'
+        required: true
+        default: 'ubuntu-latest'
+
+jobs:
+  build-and-analyze:
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Compile C Code
+        uses: MyDummyorg159/actions-repo/.github/actions/compile@main
+        with:
+          c_file: "src/sample.c"
+
+      - name: Static Code Analysis
+        uses: MyDummyorg159/actions-repo/.github/actions/static-analysis@main
+        with:
+          c_file: "src/sample.c"
