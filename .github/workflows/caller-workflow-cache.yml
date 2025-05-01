@@ -1,11 +1,7 @@
-name: caller-workflow-cache
+name: compile-and-analyze-with-cache
 
 on:
   workflow_dispatch
-  # push:
-  #   branches:
-  #     - main
-  # pull_request:
 
 jobs:
   compile:
@@ -13,19 +9,20 @@ jobs:
     outputs:
       build-cache-key: ${{ steps.set-cache-key.outputs.key }}
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Generate cache key
         id: set-cache-key
         run: echo "key=build-${{ runner.os }}-${{ hashFiles('src/**/*.c', 'src/**/*.h') }}" >> $GITHUB_OUTPUT
 
-      - name: Compile C Code
-        uses: MyDummyorg159/actions-repo/.github/actions/compile@main
-        with:
-          c_file: "src/sample.c"
+      - name: Create build directory
+        run: mkdir -p build
 
-      - name: Save compiled build to cache
+      - name: Compile C code
+        run: gcc -Wall -Werror -o build/myapp src/sample.c
+
+      - name: Save build output to cache
         uses: actions/cache/save@v4
         with:
           path: build/
@@ -35,10 +32,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: compile
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Restore build output from compile job
+      - name: Restore build cache from compile job
         uses: actions/cache@v4
         with:
           path: build/
@@ -46,7 +43,8 @@ jobs:
           restore-keys: |
             build-${{ runner.os }}-
 
-      - name: Static Code Analysis
-        uses: MyDummyorg159/actions-repo/.github/actions/static-analysis@main
-        with:
-          c_file: "src/sample.c"
+      - name: Install cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      - name: Run Static Code Analysis
+        run: cppcheck src/ --enable=all --inconclusive --error-exitcode=1
