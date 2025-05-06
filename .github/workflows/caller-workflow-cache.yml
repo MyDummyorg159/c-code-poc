@@ -12,36 +12,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create files and cache them
+      - name: Create dummy file (only needed first run)
+        run: mkdir -p mycache && echo "stub" > mycache/.init.txt
+
+      - name: Cache using hashFiles
         id: cache
         uses: actions/cache@v4
         with:
           path: mycache
           key: multi-file-cache-${{ hashFiles('mycache/*.txt') }}
 
-      - name: Generate files if cache miss
+      - name: Generate .txt files if cache miss
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          mkdir -p mycache
           echo "Generated at $(date)" > mycache/file1.txt
-          echo "Hello again at $(date)" > mycache/file2.txt
-          echo "Some dynamic content" > mycache/file3.txt
+          echo "Another at $(date)" > mycache/file2.txt
+          echo "Dynamic stuff" > mycache/file3.txt
 
   read-files:
     runs-on: ubuntu-latest
     needs: generate-files
     steps:
-      - name: Restore cached files
+      - name: Restore cache
         uses: actions/cache@v4
         with:
           path: mycache
           key: ${{ needs.generate-files.outputs.cache-key }}
 
-      - name: Print .txt contents
+      - name: Display contents
         run: |
-          echo "Listing contents of mycache:"
+          echo "Cached files:"
           ls -l mycache
-          echo ""
           for file in mycache/*.txt; do
             echo "--- $file ---"
             cat "$file"
