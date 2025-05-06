@@ -4,38 +4,47 @@ on:
   workflow_dispatch:
 
 jobs:
-  generate-file:
+  generate-files:
     runs-on: ubuntu-latest
     outputs:
-      cache-key: ${{ steps.set-key.outputs.key }}
+      cache-key: ${{ steps.cache.outputs.cache-primary-key }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Generate a unique cache key
-        id: set-key
-        run: echo "key=cache-${{ github.run_id }}" >> $GITHUB_OUTPUT
+      - name: Create and cache files
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: mycache
+          key: multi-file-cache-${{ github.run_id }}
+        continue-on-error: true # avoid failure if cache already exists
 
-      - name: Create a text file
+      - name: Create dynamic .txt files
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          mkdir mycache
-          echo "Hello from job 1!" > mycache/message.txt
+          mkdir -p mycache
+          echo "Generated at $(date)" > mycache/file1.txt
+          echo "Hello world at $(date)" > mycache/file2.txt
+          echo "Dynamic cache content" > mycache/file3.txt
 
-      - name: Cache the file
-        uses: actions/cache@v4
-        with:
-          path: mycache
-          key: ${{ steps.set-key.outputs.key }}
-
-  read-file:
+  read-files:
     runs-on: ubuntu-latest
-    needs: generate-file
+    needs: generate-files
     steps:
-      - name: Restore cache
+      - name: Restore cached files
         uses: actions/cache@v4
         with:
           path: mycache
-          key: ${{ needs.generate-file.outputs.cache-key }}
+          key: ${{ needs.generate-files.outputs.cache-key }}
 
-      - name: Display file content
-        run: cat mycache/message.txt
+      - name: Print contents of all .txt files
+        run: |
+          echo "Listing files:"
+          ls -l mycache
+          echo "Displaying file contents:"
+          for file in mycache/*.txt; do
+            echo "--- $file ---"
+            cat "$file"
+            echo ""
+          done
