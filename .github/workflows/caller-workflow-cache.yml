@@ -1,50 +1,41 @@
-name: compile-and-analyze-with-cache
+name: caller-workflow-cache
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
 
 jobs:
-  compile:
+  generate-file:
     runs-on: ubuntu-latest
     outputs:
-      build-cache-key: ${{ steps.set-cache-key.outputs.key }}
+      cache-key: ${{ steps.set-key.outputs.key }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Generate cache key
-        id: set-cache-key
-        run: echo "key=build-${{ runner.os }}-${{ hashFiles('src/**/*.c', 'src/**/*.h') }}" >> $GITHUB_OUTPUT
+      - name: Generate a unique cache key
+        id: set-key
+        run: echo "key=cache-${{ github.run_id }}" >> $GITHUB_OUTPUT
 
-      - name: Create build directory
-        run: mkdir -p build
+      - name: Create a text file
+        run: |
+          mkdir mycache
+          echo "Hello from job 1!" > mycache/message.txt
 
-      - name: Compile C code
-        run: gcc -Wall -Werror -o build/myapp src/sample.c
-
-      - name: Save build output to cache
-        uses: actions/cache/save@v4
-        with:
-          path: build/
-          key: ${{ steps.set-cache-key.outputs.key }}
-
-  static-analysis:
-    runs-on: ubuntu-latest
-    needs: compile
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Restore build cache from compile job
+      - name: Cache the file
         uses: actions/cache@v4
         with:
-          path: build/
-          key: ${{ needs.compile.outputs.build-cache-key }}
-          restore-keys: |
-            build-${{ runner.os }}-
+          path: mycache
+          key: ${{ steps.set-key.outputs.key }}
 
-      - name: Install cppcheck
-        run: sudo apt-get update && sudo apt-get install -y cppcheck
+  read-file:
+    runs-on: ubuntu-latest
+    needs: generate-file
+    steps:
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: mycache
+          key: ${{ needs.generate-file.outputs.cache-key }}
 
-      - name: Run Static Code Analysis
-        run: cppcheck src/ --enable=all --inconclusive --error-exitcode=1
+      - name: Display file content
+        run: cat mycache/message.txt
