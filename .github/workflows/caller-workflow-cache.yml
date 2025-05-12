@@ -1,52 +1,43 @@
 name: caller-workflow-cache
 
-on:
-  workflow_dispatch:
+on: [push]
 
 jobs:
-  generate-files:
+  job1:
+    name: Create and Cache File
     runs-on: ubuntu-latest
-    outputs:
-      cache-key: ${{ steps.cache.outputs.cache-primary-key }}
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create seed file to ensure hashFiles works
+      - name: Create hello.txt
         run: |
           mkdir -p mycache
-          echo "seed file" > mycache/seed.txt
+          echo "hello world" > mycache/hello.txt
 
-      - name: Cache files (key based on seed.txt)
-        id: cache
+      - name: Cache hello.txt using hashFiles
+        id: cache-step
         uses: actions/cache@v4
         with:
           path: mycache
-          key: multi-file-cache-${{ hashFiles('mycache/seed.txt') }}
+          key: hello-cache-${{ hashFiles('mycache/hello.txt') }}
 
-      - name: Generate .txt files if cache miss
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          echo "File1 at $(date)" > mycache/file1.txt
-          echo "File2 at $(date)" > mycache/file2.txt
-          echo "File3 at $(date)" > mycache/file3.txt
-
-  read-files:
+  job2:
+    name: Retrieve and Use Cached File
     runs-on: ubuntu-latest
-    needs: generate-files
+    needs: job1
     steps:
-      - name: Restore cache
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Restore Cache using hashFiles
         uses: actions/cache@v4
         with:
           path: mycache
-          key: ${{ needs.generate-files.outputs.cache-key }}
+          key: hello-cache-${{ hashFiles('mycache/hello.txt') }}
+          restore-keys: |
+            hello-cache-
 
-      - name: Print cached file contents
+      - name: Show File Content
         run: |
-          echo "Cached files:"
-          ls -l mycache
-          for file in mycache/*.txt; do
-            echo "--- $file ---"
-            cat "$file"
-            echo ""
-          done
+          cat mycache/hello.txt
