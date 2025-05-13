@@ -1,6 +1,6 @@
 name: caller-workflow-cache
 
-on: [push]
+on: workflow_dispatch
 
 jobs:
   job1:
