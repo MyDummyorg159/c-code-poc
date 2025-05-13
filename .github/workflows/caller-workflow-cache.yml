@@ -9,7 +9,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+  
+      - name: Create hello.txt
+        run: |
+          mkdir -p mycache
+          echo "hello world, from me" > mycache/hello.txt
+  
       - name: Cache hello.txt using hashFiles
         id: cache-step
         uses: actions/cache@v4
@@ -17,10 +22,6 @@ jobs:
           path: mycache
           key: hello-cache-${{ hashFiles('mycache/hello.txt') }}
 
-      - name: Create hello.txt
-        run: |
-          mkdir -p mycache
-          echo "hello world, from me" > mycache/hello.txt
 
   job2:
     name: Retrieve and Use Cached File
