@@ -20,7 +20,7 @@ jobs:
       - name: Create hello.txt
         run: |
           mkdir -p mycache
-          echo "hello world" > mycache/hello.txt
+          echo "hello world, from me" > mycache/hello.txt
 
   job2:
     name: Retrieve and Use Cached File
