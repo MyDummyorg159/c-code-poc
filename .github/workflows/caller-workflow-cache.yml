@@ -10,17 +10,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create hello.txt
-        run: |
-          mkdir -p mycache
-          echo "hello world" > mycache/hello.txt
-
       - name: Cache hello.txt using hashFiles
         id: cache-step
         uses: actions/cache@v4
         with:
           path: mycache
           key: hello-cache-${{ hashFiles('mycache/hello.txt') }}
+
+      - name: Create hello.txt
+        run: |
+          mkdir -p mycache
+          echo "hello world" > mycache/hello.txt
 
   job2:
     name: Retrieve and Use Cached File
@@ -30,13 +30,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Restore Cache using hashFiles
+      - name: Cache hello.txt using hashFiles
+        id: cache-step
         uses: actions/cache@v4
         with:
           path: mycache
           key: hello-cache-${{ hashFiles('mycache/hello.txt') }}
-          restore-keys: |
-            hello-cache-
 
       - name: Show File Content
         run: |
