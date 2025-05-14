@@ -20,8 +20,8 @@ jobs:
           python -m venv .venv
           source .venv/bin/activate
           pip install requests pandas
-          echo "Custom data" > data.txt
-          echo "Model checkpoint" > model.pt
+          echo "Custom data for demo" > data.txt
+          echo "Trained model placeholder" > model.pt
 
       - name: Cache entire environment
         id: cache-env
@@ -31,14 +31,15 @@ jobs:
             .venv
             data.txt
             model.pt
-          key: full-env-${{ hashFiles('requirements.txt') }}
+          key: full-env-${{ hashFiles('**/data.txt', '**/model.pt') }}
           restore-keys: |
             full-env-
 
-      - name: List environment contents
+      - name: Show environment contents
         run: |
           ls -la
-          source .venv/bin/activate && pip list
+          source .venv/bin/activate
+          pip list
 
   replicate-env:
     runs-on: ubuntu-latest
@@ -58,13 +59,16 @@ jobs:
             .venv
             data.txt
             model.pt
-          key: full-env-${{ hashFiles('requirements.txt') }}
+          key: full-env-${{ hashFiles('**/data.txt', '**/model.pt') }}
           restore-keys: |
             full-env-
 
-      - name: Validate replicated environment
+      - name: Use cached environment
         run: |
-          ls -la
-          source .venv/bin/activate && pip list
+          source .venv/bin/activate
+          echo "Running with cached virtual environment..."
+          python -c "import pandas as pd; print('Pandas version from cache:', pd.__version__)"
+          echo "--- Contents of data.txt ---"
           cat data.txt
+          echo "--- Contents of model.pt ---"
           cat model.pt
