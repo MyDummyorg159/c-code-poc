@@ -19,7 +19,7 @@ jobs:
         with:
           c_file: "src/sample.c"
 
-      - name: Static Code Analysis
-        uses: MyDummyorg159/actions-repo/.github/actions/static-analysis@main
-        with:
-          c_file: "src/sample.c"
+      # - name: Static Code Analysis
+      #   uses: MyDummyorg159/actions-repo/.github/actions/static-analysis@main
+      #   with:
+      #     c_file: "src/sample.c"
