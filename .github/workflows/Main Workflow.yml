@@ -5,11 +5,11 @@ on:
 
 jobs:
   call-workflow-a:
-    uses: ./.github/workflows/reusable-workflow-a.yml
+    uses: .github/workflows/reusable-workflow-a.yml@main
     with:
       name: "Job A"
 
   call-workflow-b:
-    uses: ./.github/workflows/reusable-workflow-b.yml
+    uses: .github/workflows/reusable-workflow-b.yml@main
     with:
       name: "Job B"
