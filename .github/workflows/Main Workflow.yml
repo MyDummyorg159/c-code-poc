@@ -1,0 +1,15 @@
+name: Main Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  call-workflow-a:
+    uses: ./.github/workflows/reusable-workflow-a.yml
+    with:
+      name: "Job A"
+
+  call-workflow-b:
+    uses: ./.github/workflows/reusable-workflow-b.yml
+    with:
+      name: "Job B"
