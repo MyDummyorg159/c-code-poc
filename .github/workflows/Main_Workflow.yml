@@ -1,0 +1,17 @@
+name: Main_Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  call-workflow-a:
+    uses: MyDummyorg159/c-code-poc/.github/workflows/reusable-workflow-a.yml@main
+    with:
+      name: "Job A"
+    secrets: inherit
+
+  call-workflow-b:
+    uses: MyDummyorg159/c-code-poc/.github/workflows/reusable-workflow-b.yml@main
+    with:
+      name: "Job B"
+    secrets: inherit
