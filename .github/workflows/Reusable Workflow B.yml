@@ -1,0 +1,14 @@
+name: Reusable Workflow B
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+
+jobs:
+  job-b:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "Running Reusable Workflow B with name: ${{ inputs.name }}"'
